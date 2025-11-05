@@ -1,12 +1,23 @@
+body {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-#timer {
-  width: 460px;
-  font-size: 70px;
+#timer, #controls {
+  display: inline-flex;
+  flex-direction: row;
   background-color: black;
-  color: limegreen;
   padding: 25px;
   border-radius: 10px;
+  box-sizing: border-box;
 }
+
+#timer {
+  font-size: 70px;
+  color: limegreen;
+}
+
 #labels {
   margin-top: -25px;
   z-index: 2;
@@ -18,26 +29,22 @@
 #ss {margin-left: 70px;}
 #cs {margin-left: 45px;}
 
-#controls {
-  margin-left:150px;
-  margin-top: 30px;
+#controls  {
+  justify-content: space-around;
 }
 
 button {
   width: 100px;
   height: 40px;
-  float: left;
-  margin-left: 50px;
   font-size: 25px;
   font-weight: bold;
   border-radius: 10px;
-  box-shadow: 5px 5px 5px #888888;
 }
 #go    { background-color: limegreen; }
 
-#stop  { background-color: red;  display: none; }
+#stop  { background-color: red}
 
-#clear { background-color: yellow; display: none;}
+#clear { background-color: gray}
 
 body, button {
   font-family: 'Courier';
