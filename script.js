@@ -1,99 +1,78 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
 
-// global object
-T = {} ;
-T.timerDiv = document.getElementById('timer');
+class Stopwatch {
+  running = false
 
-function displayTimer() {
-  // initilized all local variables:
-  var hours='00', minutes='00',
-  miliseconds=0, seconds='00',
-  time = '',
-  timeNow = new Date().getTime(); // timestamp (miliseconds)
-
-  T.difference = timeNow - T.timerStarted;
-
-  // milliseconds
-  if(T.difference > 10) {
-    miliseconds = Math.floor((T.difference % 1000) / 10);
-    if(miliseconds < 10) {
-      miliseconds = '0'+String(miliseconds);
-    }
+  constructor(display, running_time = 0) {
+    this.display = display
+    this.running_time = running_time
   }
-  // seconds
-  if(T.difference > 1000) {
-    seconds = Math.floor(T.difference / 1000);
-    if (seconds > 60) {
-      seconds = seconds % 60;
-    }
-    if(seconds < 10) {
-      seconds = '0'+String(seconds);
+
+  get time() {
+    if (this.running) {
+      return this.running_time + (Date.now() - this.start_time)
+    } else {
+      return this.running_time
     }
   }
 
-  // minutes
-  if(T.difference > 60000) {
-    minutes = Math.floor(T.difference/60000);
-    if (minutes > 60) {
-      minutes = minutes % 60;
-    }
-    if(minutes < 10) {
-      minutes = '0'+String(minutes);
+  start() {
+    if (!this.running) {
+      this.running = true
+      this.start_time = Date.now()
+      this.timer = setInterval(() => this.update(), 10)
     }
   }
 
-  // hours
-  if(T.difference > 3600000) {
-    hours = Math.floor(T.difference/3600000);
-    // if (hours > 24) {
-    // 	hours = hours % 24;
-    // }
-    if(hours < 10) {
-      hours = '0'+String(hours);
+  stop() {
+    if (this.running) {
+      this.running = false
+      this.running_time += Date.now() - this.start_time
+      clearInterval(this.timer)
     }
   }
 
-  time  =  hours   + ':'
-  time += minutes + ':'
-  time += seconds + ':'
-  time += miliseconds;
+  clear() {
+    this.running_time = 0
+    this.start_time = Date.now()
+  }
 
-  T.timerDiv.innerHTML = time;
+  update() {
+    this.display
+    (
+      {
+      hours: Math.floor(this.time / 3600000),
+      minutes: Math.floor((this.time % 3600000) / 60000),
+      seconds: Math.floor((this.time % 60000) / 1000),
+      centiseconds: Math.floor((this.time % 1000) / 10),
+      }
+      , this.running
+    )
+  }
 }
 
-function startTimer() {
-  // save start time
-  T.timerStarted = new Date().getTime()
-  console.log('T.timerStarted: '+T.timerStarted)
+function display(time, running) {
+  document.getElementById('timer').textContent =
+    // Format time as HH:MM:SS:CC
+    Object.entries(time)
+      .map(([key, value]) => value.toString().padStart(2, '0'))
+      .join(':') 
 
-  if (T.difference > 0) {
-    T.timerStarted = T.timerStarted - T.difference
+  // Update buttons
+  if (running) {
+    document.getElementById('start').disabled = true
+    document.getElementById('stop').disabled = true
+  } else {
+    document.getElementById('start').disabled = false
+    document.getElementById('stop').disabled = false
   }
-  // update timer periodically
-  T.timerInterval = setInterval(function() {
-    displayTimer()
-  }, 10);
-
-  // show / hide the relevant buttons:
-  document.getElementById('go').style.display="none";
-  document.getElementById('stop').style.display="inline";
-  document.getElementById('clear').style.display="none";
 }
 
-function stopTimer() {
-  clearInterval(T.timerInterval); // stop updating the timer
+// create the stopwatch
+let stopwatch = new Stopwatch(display, 0)
 
-  document.getElementById('stop').style.display="none";
-  document.getElementById('go').style.display="inline";
-  document.getElementById('clear').style.display="inline";
-}
+// add event listensers for buttons
 
-function clearTimer() {
-  clearInterval(T.timerInterval);
-  T.timerDiv.innerHTML = "00:00:00:00"; // reset timer to all zeros
-  T.difference = 0;
-
-  document.getElementById('stop').style.display="none";
-  document.getElementById('go').style.display="inline";
-  document.getElementById('clear').style.display="none";
-}
+document.getElementById('go').addEventListener("click",() => stopwatch.start())
+document.getElementById('stop').addEventListener("click",() => stopwatch.stop())
+document.getElementById('clear').addEventListener("click",() => stopwatch.clear())
