@@ -35,6 +35,7 @@ class Stopwatch {
   clear() {
     this.running_time = 0
     this.start_time = Date.now()
+    this.update()
   }
 
   update() {
